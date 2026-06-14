@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const quizRoutes = require("./routes/quizRoutes");
+const PORT = process.env.PORT || 5000;
 
 
 const app = express();
@@ -61,6 +62,6 @@ app.use(
 
 app.use("/api/admin", require("./routes/adminRoutes"));
 
-app.listen(5000, () => {
-  console.log("Server Running on Port 5000");
+app.listen(PORT, () => {
+  console.log(`Server Running on Port ${PORT}`);
 });
