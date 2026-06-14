@@ -13,9 +13,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(
-  "mongodb://127.0.0.1:27017/lmsdb"
-);
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected Successfully");
+  })
+  .catch((err) => {
+    console.log("MongoDB Error:", err);
+  });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", require("./routes/userRoutes"));
