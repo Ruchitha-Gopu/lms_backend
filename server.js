@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
-const quizRoutes = require("./routes/quizRoutes");
+
 const PORT = process.env.PORT || 5000;
 
 
@@ -21,6 +21,10 @@ mongoose
   .catch((err) => {
     console.log("MongoDB Error:", err);
   });
+
+  app.get("/", (req, res) => {
+  res.send("LMS Backend Running Successfully 🚀");
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", require("./routes/userRoutes"));
