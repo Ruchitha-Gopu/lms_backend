@@ -1,74 +1,38 @@
 const express = require("express");
 const router = express.Router();
-
 const Assignment = require("../models/Assignment");
 
-// user dashboard - get assignments by userId
-router.get("/user/:userId", async (req, res) => {
-  try {
-    const assignments = await Assignment.find({
-      userId: req.params.userId,
-    });
-
-    res.json(assignments);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-});
-
-// admin dashboard - get all assignments
 router.get("/", async (req, res) => {
-  try {
-    const assignments = await Assignment.find();
-    res.json(assignments);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+  const assignments = await Assignment.find().populate("userId", "name email");
+  res.json(assignments);
 });
 
-// admin add assignment
+router.get("/user/:userId", async (req, res) => {
+  const assignments = await Assignment.find({
+    userId: req.params.userId,
+  });
+
+  res.json(assignments);
+});
+
 router.post("/", async (req, res) => {
-  try {
-    const assignment = await Assignment.create(req.body);
-    res.status(201).json(assignment);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+  const assignment = await Assignment.create(req.body);
+  res.status(201).json(assignment);
 });
 
-// update status
 router.put("/:id", async (req, res) => {
-  try {
-    const assignment = await Assignment.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+  const assignment = await Assignment.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
 
-    res.json(assignment);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+  res.json(assignment);
 });
 
-// delete
 router.delete("/:id", async (req, res) => {
-  try {
-    await Assignment.findByIdAndDelete(req.params.id);
-    res.json({ message: "Assignment deleted" });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+  await Assignment.findByIdAndDelete(req.params.id);
+  res.json({ message: "Assignment deleted" });
 });
 
 module.exports = router;
