@@ -12,6 +12,12 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Name, email and password are required",
+      });
+    }
+
     const cleanEmail = email.toLowerCase().trim();
 
     const existingUser = await User.findOne({ email: cleanEmail });
@@ -42,8 +48,8 @@ router.post("/register", async (req, res) => {
         <p>Role: <b>${user.role}</b></p>
         `
       );
-    } catch (error) {
-      console.log("Email Error:", error.message);
+    } catch (mailError) {
+      console.log("Register Mail Error:", mailError.message);
     }
 
     res.status(201).json({
@@ -67,6 +73,12 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
+    }
 
     const cleanEmail = email.toLowerCase().trim();
 
@@ -107,8 +119,8 @@ router.post("/login", async (req, res) => {
         <p>Your login token is valid for <b>2 hours</b>.</p>
         `
       );
-    } catch (error) {
-      console.log("Email Error:", error.message);
+    } catch (mailError) {
+      console.log("Login Mail Error:", mailError.message);
     }
 
     res.json({
@@ -129,7 +141,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ONLY USERS DISPLAY IN MANAGE USERS
+// GET ONLY REGISTERED NORMAL USERS
 router.get("/users", async (req, res) => {
   try {
     const users = await User.find({ role: "user" })
