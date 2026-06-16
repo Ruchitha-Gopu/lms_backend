@@ -14,9 +14,7 @@ router.post("/register", async (req, res) => {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    const existingUser = await User.findOne({
-      email: cleanEmail,
-    });
+    const existingUser = await User.findOne({ email: cleanEmail });
 
     if (existingUser) {
       return res.status(400).json({
@@ -34,20 +32,25 @@ router.post("/register", async (req, res) => {
       role: role || "user",
     });
 
-    await sendEmail(
-      cleanEmail,
-      "LMS Registration Successful",
-      `
-      <h2>Hello ${name},</h2>
-      <p>Your LMS account has been created successfully.</p>
-      <p>Role: <b>${user.role}</b></p>
-      `
-    );
+    try {
+      await sendEmail(
+        cleanEmail,
+        "LMS Registration Successful",
+        `
+        <h2>Hello ${name},</h2>
+        <p>Your LMS account has been created successfully.</p>
+        <p>Role: <b>${user.role}</b></p>
+        `
+      );
+    } catch (error) {
+      console.log("Email Error:", error.message);
+    }
 
     res.status(201).json({
       message: "Registered successfully",
       user: {
         id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -67,9 +70,7 @@ router.post("/login", async (req, res) => {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    const user = await User.findOne({
-      email: cleanEmail,
-    });
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
       return res.status(404).json({
@@ -77,10 +78,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -93,27 +91,32 @@ router.post("/login", async (req, res) => {
         id: user._id,
         role: user.role,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "lms_secret_key",
       {
         expiresIn: "2h",
       }
     );
 
-    await sendEmail(
-      user.email,
-      "LMS Login Successful",
-      `
-      <h2>Hello ${user.name},</h2>
-      <p>You logged in successfully.</p>
-      <p>Your login token is valid for <b>2 hours</b>.</p>
-      `
-    );
+    try {
+      await sendEmail(
+        user.email,
+        "LMS Login Successful",
+        `
+        <h2>Hello ${user.name},</h2>
+        <p>You logged in successfully.</p>
+        <p>Your login token is valid for <b>2 hours</b>.</p>
+        `
+      );
+    } catch (error) {
+      console.log("Email Error:", error.message);
+    }
 
     res.json({
       message: "Login successful",
       token,
       user: {
         id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -122,6 +125,38 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: error.message,
+    });
+  }
+});
+
+// ONLY USERS DISPLAY IN MANAGE USERS
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find({ role: "user" })
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message,
+    });
+  }
+});
+
+// DELETE USER
+router.delete("/users/:id", async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete user",
+      error: error.message,
     });
   }
 });
