@@ -12,12 +12,6 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "Name, email and password are required",
-      });
-    }
-
     const cleanEmail = email.toLowerCase().trim();
 
     const existingUser = await User.findOne({
@@ -40,25 +34,20 @@ router.post("/register", async (req, res) => {
       role: role || "user",
     });
 
-    try {
-      await sendEmail(
-        cleanEmail,
-        "LMS Registration Successful",
-        `
-        <h2>Hello ${name},</h2>
-        <p>Your LMS account has been created successfully.</p>
-        <p>Role: <b>${user.role}</b></p>
-        `
-      );
-    } catch (mailError) {
-      console.log("Register Email Error:", mailError.message);
-    }
+    await sendEmail(
+      cleanEmail,
+      "LMS Registration Successful",
+      `
+      <h2>Hello ${name},</h2>
+      <p>Your LMS account has been created successfully.</p>
+      <p>Role: <b>${user.role}</b></p>
+      `
+    );
 
     res.status(201).json({
       message: "Registered successfully",
       user: {
         id: user._id,
-        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -76,12 +65,6 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Email and password are required",
-      });
-    }
-
     const cleanEmail = email.toLowerCase().trim();
 
     const user = await User.findOne({
@@ -94,7 +77,10 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
 
     if (!isMatch) {
       return res.status(400).json({
@@ -107,32 +93,27 @@ router.post("/login", async (req, res) => {
         id: user._id,
         role: user.role,
       },
-      process.env.JWT_SECRET || "lms_secret_key",
+      process.env.JWT_SECRET,
       {
         expiresIn: "2h",
       }
     );
 
-    try {
-      await sendEmail(
-        user.email,
-        "LMS Login Successful",
-        `
-        <h2>Hello ${user.name},</h2>
-        <p>You logged in successfully.</p>
-        <p>Your login token is valid for <b>2 hours</b>.</p>
-        `
-      );
-    } catch (mailError) {
-      console.log("Login Email Error:", mailError.message);
-    }
+    await sendEmail(
+      user.email,
+      "LMS Login Successful",
+      `
+      <h2>Hello ${user.name},</h2>
+      <p>You logged in successfully.</p>
+      <p>Your login token is valid for <b>2 hours</b>.</p>
+      `
+    );
 
     res.json({
       message: "Login successful",
       token,
       user: {
         id: user._id,
-        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -141,36 +122,6 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: error.message,
-    });
-  }
-});
-
-// GET ALL REGISTERED USERS
-router.get("/users", async (req, res) => {
-  try {
-    const users = await User.find().select("-password").sort({ createdAt: -1 });
-
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch users",
-      error: error.message,
-    });
-  }
-});
-
-// GET ONLY NORMAL USERS
-router.get("/normal-users", async (req, res) => {
-  try {
-    const users = await User.find({ role: "user" })
-      .select("-password")
-      .sort({ createdAt: -1 });
-
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch normal users",
-      error: error.message,
     });
   }
 });
