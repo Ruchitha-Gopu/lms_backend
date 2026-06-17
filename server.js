@@ -59,11 +59,11 @@ app.use(
   
 //admin panel
 
-
 app.use(
   "/api/courses",
   require("./routes/courseRoutes")
 );
+
 app.use(
   "/api/students",
   require("./routes/studentRoutes")
