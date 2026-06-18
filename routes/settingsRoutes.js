@@ -22,7 +22,7 @@ router.get("/user/:userId", async (req, res) => {
       });
     }
 
-    res.json(settings);
+    res.status(200).json(settings);
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch settings",
@@ -37,21 +37,22 @@ router.put("/user/:userId", async (req, res) => {
       { userId: req.params.userId },
       {
         userId: req.params.userId,
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        phone: req.body.phone,
-        education: req.body.education,
-        darkMode: req.body.darkMode,
-        notifications: req.body.notifications,
+        name: req.body.name || "",
+        email: req.body.email || "",
+        password: req.body.password || "",
+        phone: req.body.phone || "",
+        education: req.body.education || "",
+        darkMode: req.body.darkMode ?? false,
+        notifications: req.body.notifications ?? true,
       },
       {
         new: true,
         upsert: true,
+        runValidators: true,
       }
     );
 
-    res.json(updatedSettings);
+    res.status(200).json(updatedSettings);
   } catch (error) {
     res.status(500).json({
       message: "Failed to update settings",
