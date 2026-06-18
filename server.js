@@ -75,6 +75,7 @@ app.use(
 );
 
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/users", require("./routes/manageUserRoutes"));
 
 app.listen(PORT, () => {
   console.log(`Server Running on Port ${PORT}`);

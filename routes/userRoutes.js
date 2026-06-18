@@ -3,12 +3,6 @@ const router = express.Router();
 
 const Course = require("../models/Course");
 
-/*
-POST
-/api/user/courses
-Add Course
-*/
-
 router.post("/courses", async (req, res) => {
   try {
     const course = await Course.create(req.body);
@@ -25,12 +19,6 @@ router.post("/courses", async (req, res) => {
   }
 });
 
-/*
-GET
-/api/user/courses
-Get All Courses
-*/
-
 router.get("/courses", async (req, res) => {
   try {
     const courses = await Course.find();
@@ -44,17 +32,9 @@ router.get("/courses", async (req, res) => {
   }
 });
 
-/*
-GET
-/api/user/courses/:id
-Get Single Course
-*/
-
 router.get("/courses/:id", async (req, res) => {
   try {
-    const course = await Course.findById(
-      req.params.id
-    );
+    const course = await Course.findById(req.params.id);
 
     if (!course) {
       return res.status(404).json({
