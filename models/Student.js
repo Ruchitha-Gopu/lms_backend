@@ -1,27 +1,32 @@
 const mongoose = require("mongoose");
 
-const settingSchema = new mongoose.Schema(
+const studentSchema = new mongoose.Schema(
   {
-    userId: {
+    name: {
+      type: String,
+      required: true,
+    },
+
+    email: {
       type: String,
       required: true,
       unique: true,
     },
-    name: String,
-    email: String,
-    password: String,
-    phone: String,
-    education: String,
-    darkMode: {
-      type: Boolean,
-      default: false,
+
+    course: {
+      type: String,
+      required: true,
     },
-    notifications: {
-      type: Boolean,
-      default: true,
+
+    status: {
+      type: String,
+      default: "Active",
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Setting", settingSchema);
+module.exports = mongoose.model(
+  "Student",
+  studentSchema
+);

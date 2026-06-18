@@ -56,6 +56,11 @@ app.use(
   "/api/settings",
   require("./routes/settingsRoutes")
 );
+
+app.use(
+  "/api/settings",
+  require("./routes/settingsRoutes")
+);
   
 //admin panel
 

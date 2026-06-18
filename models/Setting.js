@@ -9,10 +9,10 @@ const settingSchema = new mongoose.Schema(
     },
 
     name: String,
-
     email: String,
-
     password: String,
+    phone: String,
+    education: String,
 
     darkMode: {
       type: Boolean,
@@ -27,7 +27,4 @@ const settingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model(
-  "Setting",
-  settingSchema
-);
+module.exports = mongoose.model("Setting", settingSchema);

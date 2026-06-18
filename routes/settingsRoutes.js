@@ -3,68 +3,59 @@ const router = express.Router();
 
 const Setting = require("../models/Setting");
 
-// GET SETTINGS
-router.get("/:userId", async (req, res) => {
+router.get("/user/:userId", async (req, res) => {
   try {
-    const settings = await Setting.findOne({
+    let settings = await Setting.findOne({
       userId: req.params.userId,
     });
 
     if (!settings) {
-      return res.status(404).json({
-        message: "Settings not found",
+      settings = await Setting.create({
+        userId: req.params.userId,
+        name: "",
+        email: "",
+        password: "",
+        phone: "",
+        education: "",
+        darkMode: false,
+        notifications: true,
       });
     }
 
     res.json(settings);
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      message: "Failed to fetch settings",
+      error: error.message,
     });
   }
 });
 
-// CREATE / UPDATE SETTINGS
-router.post("/", async (req, res) => {
+router.put("/user/:userId", async (req, res) => {
   try {
-    const {
-      userId,
-      name,
-      email,
-      password,
-      darkMode,
-      notifications,
-    } = req.body;
+    const updatedSettings = await Setting.findOneAndUpdate(
+      { userId: req.params.userId },
+      {
+        userId: req.params.userId,
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        phone: req.body.phone,
+        education: req.body.education,
+        darkMode: req.body.darkMode,
+        notifications: req.body.notifications,
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
 
-    let settings = await Setting.findOne({
-      userId,
-    });
-
-    if (settings) {
-      settings.name = name;
-      settings.email = email;
-      settings.password = password;
-      settings.darkMode = darkMode;
-      settings.notifications = notifications;
-
-      await settings.save();
-
-      return res.json(settings);
-    }
-
-    settings = await Setting.create({
-      userId,
-      name,
-      email,
-      password,
-      darkMode,
-      notifications,
-    });
-
-    res.status(201).json(settings);
+    res.json(updatedSettings);
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      message: "Failed to update settings",
+      error: error.message,
     });
   }
 });
