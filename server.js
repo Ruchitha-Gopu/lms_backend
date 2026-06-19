@@ -69,11 +69,6 @@ app.use(
   require("./routes/courseRoutes")
 );
 
-app.use(
-  "/api/students",
-  require("./routes/studentRoutes")
-);
-
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/users", require("./routes/manageUserRoutes"));
 
