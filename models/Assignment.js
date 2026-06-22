@@ -15,7 +15,7 @@ const assignmentSchema = new mongoose.Schema({
     default: "Pending",
   },
 });
-
+   
 module.exports = mongoose.model(
   "Assignment",
   assignmentSchema

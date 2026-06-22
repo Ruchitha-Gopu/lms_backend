@@ -22,7 +22,7 @@ const getQuiz =
   };
 
 // Add Quiz Question
-const createQuiz =
+const createQuiz = 
   async (req, res) => {
     try {
       const quiz =
