@@ -17,9 +17,7 @@ router.post("/register", async (req, res) => {
         message: "Name, email and password are required",
       });
     }
-
     const cleanEmail = email.toLowerCase().trim();
-
     const existingUser = await User.findOne({ email: cleanEmail });
 
     if (existingUser) {
